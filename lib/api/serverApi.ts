@@ -9,7 +9,7 @@ import type { User } from "../../types/user";
 
 import type { FetchNotesParams, FetchNotesResponse } from "./clientApi";
 
-interface CheckSessionResponse {
+export interface CheckSessionResponse {
   success: boolean;
 }
 
@@ -57,7 +57,9 @@ export const getMe = async (): Promise<User> => {
   return response.data;
 };
 
-export const checkSession = async (): Promise<boolean> => {
+export const checkSession = async (): Promise<
+  AxiosResponse<CheckSessionResponse>
+> => {
   const cookieStore = await cookies();
 
   const response: AxiosResponse<CheckSessionResponse> = await api.get(
@@ -69,5 +71,5 @@ export const checkSession = async (): Promise<boolean> => {
     },
   );
 
-  return response.data.success;
+  return response;
 };

@@ -1,4 +1,7 @@
+import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+
+import { checkSession } from "./lib/api/serverApi";
 
 const privateRoutes = ["/profile", "/notes"];
 const publicRoutes = ["/sign-in", "/sign-up"];
@@ -6,7 +9,7 @@ const publicRoutes = ["/sign-in", "/sign-up"];
 export default async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  const cookieStore = request.cookies;
+  const cookieStore = await cookies();
   const accessToken = cookieStore.get("accessToken")?.value;
   const refreshToken = cookieStore.get("refreshToken")?.value;
 
@@ -20,23 +23,22 @@ export default async function proxy(request: NextRequest) {
   if (!accessToken) {
     if (refreshToken) {
       try {
-        const apiRes = await fetch(
-          `${request.nextUrl.origin}/api/auth/session`,
-          {
-            headers: {
-              Cookie: request.headers.get("cookie") ?? "",
-            },
-          },
-        );
+        const apiRes = await checkSession();
 
-        const setCookie = apiRes.headers.get("set-cookie");
+        const setCookieHeader = apiRes.headers["set-cookie"];
 
-        if (setCookie) {
+        if (setCookieHeader) {
           const response = isPublicRoute
             ? NextResponse.redirect(new URL("/profile", request.url))
             : NextResponse.next();
 
-          response.headers.set("set-cookie", setCookie);
+          const cookiesToForward = Array.isArray(setCookieHeader)
+            ? setCookieHeader
+            : [setCookieHeader];
+
+          cookiesToForward.forEach((cookie) => {
+            response.headers.append("set-cookie", cookie);
+          });
 
           return response;
         }

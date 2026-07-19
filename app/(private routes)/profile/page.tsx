@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import Image from "next/image";
+import Link from "next/link";
 
 import { getMe } from "../../../lib/api/serverApi";
 
@@ -31,14 +33,13 @@ export default async function ProfilePage() {
         <div className={css.header}>
           <h1 className={css.formTitle}>Profile Page</h1>
 
-          <a href="/profile/edit" className={css.editProfileButton}>
+          <Link href="/profile/edit" className={css.editProfileButton}>
             Edit Profile
-          </a>
+          </Link>
         </div>
 
         <div className={css.avatarWrapper}>
-          {/* eslint-disable-next-line @next/next/no-img-element -- spec markup uses a plain <img> for this page */}
-          <img
+          <Image
             src={user.avatar}
             alt="User Avatar"
             width={120}
