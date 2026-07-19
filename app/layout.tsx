@@ -36,8 +36,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
+  modal,
 }: {
   children: React.ReactNode;
+  modal: React.ReactNode;
 }) {
   return (
     <html lang="uk">
@@ -46,6 +48,7 @@ export default function RootLayout({
           <AuthProvider>
             <Header />
             {children}
+            {modal}
             <Footer />
             <div id="modal-root"></div>
           </AuthProvider>
